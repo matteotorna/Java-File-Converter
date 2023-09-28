@@ -20,7 +20,7 @@ public class DownloadExampleAction extends ActionSupport {
 	public String execute() throws IOException {
 		ServletContext context = ServletActionContext.getServletContext();
 
-		String exampleFileName = "Vdt.xlsx"; //  tuo file di esempio
+		String exampleFileName = "Example.xlsx"; //  tuo file di esempio
 		String resourcePath = "/WEB-INF/excelFile/" + exampleFileName; // Percorso del file di esempio nella specifica directory
 																		
 

@@ -1,144 +1,59 @@
 package com.tool.converter;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import com.tool.model.ExcelRecord;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.tool.model.ExcelRecord;
-
 public class XmlWriter {
 
-    public void writeXml(List<ExcelRecord> vdt, String filePath) {
+    public String writeXml(List<ExcelRecord> records) {
         try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            docFactory.setNamespaceAware(true);
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.newDocument();
+            Document mainDoc = DocumentHelper.createDocument();
+            Element rootElement = mainDoc.addElement("root"); // Elemento radice generico
 
-            // Root creation
-            String namespace = "http://www.w3.org/2001/XMLSchema-instance";
-            Element rootElement = doc.createElement("FLUSSO");
-            rootElement.setAttribute("xmlns:xsi", namespace);
-            doc.appendChild(rootElement);
+            for (ExcelRecord record : records) {
+                Element recordElement = rootElement.addElement("record"); // Elemento radice per il record
 
-            Element inserisciElement = doc.createElement("INSERISCI");
-            rootElement.appendChild(inserisciElement);
+                Map<String, Object> data = record.getData();
+                for (Map.Entry<String, Object> entry : data.entrySet()) {
+                    String columnName = entry.getKey();
+                    Object value = entry.getValue();
 
-            Map<String, Element> vdtElementsMap = new HashMap<>();
-
-            for (ExcelRecord record : vdt) {
-                String dataOraInizio = record.getDataOraInizio();
-                String dataOraFine = record.getDataOraFine();
-
-                if (!vdtElementsMap.containsKey(dataOraInizio)) {
-                    Element vdtElement = doc.createElement("VDT");
-                    vdtElement.setAttribute("DATAORAINIZIO", dataOraInizio);
-                    vdtElement.setAttribute("DATAORAFINE", dataOraFine);
-
-                    Element codiceEtsoElement = doc.createElement("CODICEETSO");
-                    codiceEtsoElement.appendChild(doc.createTextNode(record.getCodiceEtso()));
-                    vdtElement.appendChild(codiceEtsoElement);
-
-                    Element IdMotivazioneElement = doc.createElement("IDMOTIVAZIONE");
-                    IdMotivazioneElement.appendChild(doc.createTextNode(record.getIdMotivazione()));
-                    vdtElement.appendChild(IdMotivazioneElement);
-
-                    Element noteElement = doc.createElement("NOTE");
-                    noteElement.appendChild(doc.createTextNode("Caricamento VDT"));
-                    vdtElement.appendChild(noteElement);
-
-                    vdtElementsMap.put(dataOraInizio, vdtElement);
-                    inserisciElement.appendChild(vdtElement);
+                    // Crea elementi XML basati sulle colonne e i valori dell'ExcelRecord
+                    Element columnElement = recordElement.addElement(getValidXmlName(columnName));
+                    if (value != null) {
+                        columnElement.setText(value.toString()); // Usa setText per impostare il contenuto dell'elemento
+                    } else {
+                        // Tratta valori nulli come vuoti o gestiscili come preferisci
+                        columnElement.setText("");
+                    }
                 }
-
-                Element vdtElement = vdtElementsMap.get(dataOraInizio);
-
-                Element fasciaElement = doc.createElement("FASCIA");
-                vdtElement.appendChild(fasciaElement);
-
-                Element psMinElement = doc.createElement("PSMIN");
-                psMinElement.appendChild(doc.createTextNode(String.valueOf(record.getPsMin())));
-                fasciaElement.appendChild(psMinElement);
-
-                Element psMaxElement = doc.createElement("PSMAX");
-                psMaxElement.appendChild(doc.createTextNode(String.valueOf(record.getPsMax())));
-                fasciaElement.appendChild(psMaxElement);
-
-                Element assettoElement = doc.createElement("ASSETTO");
-                fasciaElement.appendChild(assettoElement);
-
-                Element idAssettoElement = doc.createElement("IDASSETTO");
-                idAssettoElement.appendChild(doc.createTextNode(record.getIdAssetto()));
-                assettoElement.appendChild(idAssettoElement);
-
-                Element ptMinElement = doc.createElement("PTMIN");
-                ptMinElement.appendChild(doc.createTextNode(String.valueOf(record.getPtMin())));
-                assettoElement.appendChild(ptMinElement);
-
-                Element ptMaxElement = doc.createElement("PTMAX");
-                ptMaxElement.appendChild(doc.createTextNode(String.valueOf(record.getPtMax())));
-                assettoElement.appendChild(ptMaxElement);
-
-                Element trispElement = doc.createElement("TRISP");
-                trispElement.appendChild(doc.createTextNode(String.valueOf(record.getTRrisp())));
-                assettoElement.appendChild(trispElement);
-
-                Element gpaElement = doc.createElement("GPA");
-                gpaElement.appendChild(doc.createTextNode(String.valueOf(record.getGpa())));
-                assettoElement.appendChild(gpaElement);
-
-                Element gpdElement = doc.createElement("GPD");
-                gpdElement.appendChild(doc.createTextNode(String.valueOf(record.getGpd())));
-                assettoElement.appendChild(gpdElement);
-
-                Element tavaElement = doc.createElement("TAVA");
-                tavaElement.appendChild(doc.createTextNode(String.valueOf(record.getTava())));
-                assettoElement.appendChild(tavaElement);
-
-                Element taraElement = doc.createElement("TARA");
-                taraElement.appendChild(doc.createTextNode(String.valueOf(record.getTara())));
-                assettoElement.appendChild(taraElement);
-
-                Element brsElement = doc.createElement("BRS");
-                brsElement.appendChild(doc.createTextNode(String.valueOf(record.getBrs())));
-                assettoElement.appendChild(brsElement);
-
             }
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            // Formatta il documento XML in modo che sia ben leggibile
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            StringWriter stringWriter = new StringWriter();
+            XMLWriter writer = new XMLWriter(stringWriter, format);
+            writer.write(mainDoc);
+            writer.flush();
+            writer.close();
 
-            DOMSource source = new DOMSource(doc);
-
-            try (FileOutputStream fos = new FileOutputStream(filePath);
-                 OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-                 BufferedWriter writer = new BufferedWriter(osw)) {
-
-                writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                writer.newLine();
-                transformer.transform(source, new StreamResult(writer));
-            }
+            return stringWriter.toString();
         } catch (Exception e) {
             e.printStackTrace();
+            return null; // Tratta l'errore in qualche modo
         }
+    }
+
+    private String getValidXmlName(String columnName) {
+        // Rimuovi i caratteri non validi sostituendoli con vuoti
+        return columnName.replaceAll("[^a-zA-Z0-9]", "");
     }
 }

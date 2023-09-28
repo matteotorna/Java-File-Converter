@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE struts PUBLIC
-        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
-        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN" "http://struts.apache.org/dtds/struts-2.0.dtd">
 
 <struts>
 	<constant name="struts.devMode" value="true" />
-	<constant name="struts.multipart.maxSize" value="5242880"/>
+	<constant name="struts.multipart.maxSize" value="5242880" />
 	<package name="default" extends="struts-default" namespace="/">
-	
+
 		<!-- FileDownloadAction -->
 		<action name="fileDownload"
 			class="com.tool.struts.FileDownloadAction">
 			<result name="success" type="stream">
 				<param name="contentType">application/xml</param>
 				<param name="inputName">inputStream</param>
-				<param name="contentDisposition">attachment; filename="${filename}"</param>
+				<param name="contentDisposition">attachment;
+					filename="${filename}"</param>
 				<param name="bufferSize">1024</param>
 			</result>
 			<result name="error">/error.html</result>
@@ -23,11 +22,10 @@
 		<!-- FileUploadAction -->
 		<action name="uploadFile"
 			class="com.tool.struts.FileUploadAction">
-			<result name="input">D:/eclipse-workspace/ToolXml_Baselines/src/main/webapp/index.jsp</result>
 			<result name="success" type="stream">
 				<param name="contentType">application/xml</param>
 				<param name="contentDisposition">attachment;filename=output.xml</param>
-				<param name="inputName">inputStream</param>
+				<param name="inputName">fileInputStream</param>
 				<param name="bufferSize">1024</param>
 			</result>
 			<result name="error">/error.html</result>
@@ -37,8 +35,10 @@
 		<action name="downloadExample"
 			class="com.tool.struts.DownloadExampleAction">
 			<result name="success" type="stream">
-				<param name="contentType">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
-				<param name="contentDisposition">attachment;filename=Baseline.xlsx</param>
+				<param name="contentType">
+					application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</param>
+				<param name="contentDisposition">
+					attachment;filename=Baseline.xlsx</param>
 				<param name="inputName">inputStream</param>
 				<param name="bufferSize">1024</param>
 			</result>

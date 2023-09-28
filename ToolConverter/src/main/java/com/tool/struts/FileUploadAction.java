@@ -1,5 +1,6 @@
 package com.tool.struts;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -15,23 +16,32 @@ public class FileUploadAction extends ActionSupport {
     private File file;
     private String fileContentType;
     private String fileFileName;
-    private InputStream inputStream;
+    private String xmlContent;
+
+    private InputStream fileInputStream;
+
+    public InputStream getFileInputStream() {
+        return fileInputStream;
+    }
 
     public String execute() throws Exception {
         if (file != null) {
             // Processa il file qui
             ExcelReader reader = new ExcelReader();
-            List<ExcelRecord> records = reader.readBooksFromExcelFile(new FileInputStream(file));
+            List<ExcelRecord> records = reader.readDataFromExcel(new FileInputStream(file));
 
-            // Elabora i record qui, ad esempio convertendoli in un file XML
+            // Elabora i record qui, ad esempio convertendoli in una stringa XML
             XmlWriter writer = new XmlWriter();
-            String outputFilePath = "C://Users//Tornaboni-Dk//Documents//output.xml";
-            writer.writeXml(records, outputFilePath);
+            xmlContent = writer.writeXml(records); // Ottieni la stringa XML
 
-            // Invia il file XML al client
-            inputStream = new FileInputStream(new File(outputFilePath));
-
-            return SUCCESS;
+            if (xmlContent != null) {
+                // Imposta l'input stream per il risultato "success"
+                fileInputStream = new ByteArrayInputStream(xmlContent.getBytes("UTF-8"));
+                return SUCCESS;
+            } else {
+                // Gestione dell'errore se xmlContent è nullo
+                return ERROR;
+            }
         } else {
             return ERROR;
         }
@@ -60,8 +70,8 @@ public class FileUploadAction extends ActionSupport {
     public void setFileFileName(String fileFileName) {
         this.fileFileName = fileFileName;
     }
-    
-    public InputStream getInputStream() {
-        return inputStream;
+
+    public String getXmlContent() {
+        return xmlContent;
     }
 }
