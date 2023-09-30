@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-	integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
-	crossorigin="anonymous" referrerpolicy="no-referrer" />
-<link
-	href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css" />
-<link rel="stylesheet" href="css/fontAwesome-min.css" />
-<script src="javascript/sheetjs.js"></script>
-<script
-	src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-<title>Drag and Drop File Upload</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+		integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="css/styles.css" />
+	<link rel="stylesheet" href="css/fontAwesome-min.css" />
+	<script src="javascript/sheetjs.js"></script>
+	<script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+	<title>Drag and Drop File Upload</title>
 </head>
+
 <body>
 
 	<div class="container">
@@ -34,8 +32,7 @@
 
 		</div>
 		<div class="tab-content active" id="tab1">
-			<form id="uploadForm" action="uploadFile" method="POST"
-				enctype="multipart/form-data">
+			<form id="uploadForm" action="uploadFile" method="POST" enctype="multipart/form-data">
 				<h2>Carica il tuo file:</h2>
 				<div class="drag-area">
 					<div class="icon">
@@ -47,7 +44,7 @@
 						TOOL SUPPORTS ONLY XLSX'S FILE</span>
 				</div>
 				<div>
-					<button class="download download-btn" type="submit">Download</button>
+					<button class="download download-btn" type="submit">Download XML</button>
 				</div>
 			</form>
 			<!-- Barra di avanzamento -->
@@ -73,14 +70,12 @@
 		<div class="tab-content" id="tab2">
 			<h2>Lista dei file caricati:</h2>
 			<div class="sort-dropdown">
-				<label for="sort-select">Ordina per:</label> <select
-					id="sort-select">
+				<label for="sort-select">Ordina per:</label> <select id="sort-select">
 					<option value="name">Nome</option>
 					<option value="size">Dimensione</option>
 				</select>
 			</div>
-			<i class="fas fa-trash-alt fa-lg delete-all-button"
-				id="deleteAllButton"></i>
+			<i class="fas fa-trash-alt fa-lg delete-all-button" id="deleteAllButton"></i>
 			<ul id="fileList"></ul>
 			<div class="loader-container">
 				<div class="loader" id="loader" style="display: none;"></div>
@@ -90,24 +85,22 @@
 		<div class="tab-content" id="tab3">
 			<div class="setting-container">
 				<div class="setting-item" id="dark">
-					<span> <label>Container: Dark mode</label> <span
-						class="toggle-container"> <input type="checkbox"
-							id="container-toggle" onchange="toggleTheme()" /> <label
-							for="container-toggle" class="toggle-label"></label>
-					</span>
+					<span> <label>Container: Dark mode</label> <span class="toggle-container"> <input type="checkbox"
+								id="container-toggle" onchange="toggleTheme()" /> <label for="container-toggle"
+								class="toggle-label"></label>
+						</span>
 					</span>
 				</div>
 
 				<div class="setting-item">
 					<span> <label for="container-color">Container: Color</label>
-						<input type="color" id="container-color"
-						onchange="changeContainerColor()" />
+						<input type="color" id="container-color" onchange="changeContainerColor()" />
 					</span>
 				</div>
 
 				<div class="setting">
-					<span><i class="fas fa-info-circle"></i> <label>Versione:</label>
-						<span>1.0.0</span>
+					<span><i class="fas fa-info-circle"></i> <label>Version :</label>
+						<span>2.1.1</span>
 						<button id="saveButton" onclick="saveSettings()">Salva</button> </span>
 				</div>
 
@@ -123,5 +116,7 @@
 
 	<div id="error-message"></div>
 	<script src="javascript/scripts.js"></script>
+
 </body>
+
 </html>

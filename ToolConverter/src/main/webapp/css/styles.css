@@ -541,6 +541,11 @@ h2 {
     transition-duration: 0.4s;
 }
 
+.json-icon {
+  color: red; 
+}
+
+
 .download-button {
   background-color: green;
   color: white;
@@ -903,4 +908,3 @@ h2 {
   background-color: #d1d1d1;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Aumenta l'ombra durante il click */
 }
-

@@ -1,5 +1,7 @@
 package com.tool;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -8,7 +10,6 @@ import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.tool.converter.JsonWriter;
 import com.tool.converter.XmlWriter;
 import com.tool.model.ExcelRecord;
 import com.tool.util.ExcelReader;
@@ -25,6 +26,7 @@ public class Main {
         String excelFilePath = scanner.nextLine();
 
         List<ExcelRecord> records = null;
+        String xmlData = null; // Dichiarazione della variabile xmlData
 
         logger.info("Reading xlsx file..");
         ExcelReader reader = new ExcelReader();
@@ -40,17 +42,22 @@ public class Main {
             // Ora invece di scrivere su file, converti in stringhe XML e JSON
             logger.info("Generating XML data..");
             XmlWriter xmlWriter = new XmlWriter();
-            String xmlData = xmlWriter.writeXml(records);
+            xmlData = xmlWriter.writeXml(records); // Assegnamento del valore restituito
 
-            logger.info("Generating JSON data..");
-            JsonWriter jsonWriter = new JsonWriter();
-            String jsonData = jsonWriter.writeJson(records); // Ottieni la stringa JSON
-            logger.info(jsonData); // Stampa la rappresentazione JSON
-
-            // Puoi fare quello che vuoi con xmlData e jsonData, ad esempio inviarli su una rete o elaborarli ulteriormente
+            // Scrivi la stringa XML su un file (ad esempio, "output.xml")
+            writeXmlToFile(xmlData, "output.xml");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    private static void writeXmlToFile(String xmlData, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(xmlData);
+            logger.info("XML data written to file: " + filePath);
+        } catch (IOException e) {
+            logger.error("Error writing XML data to file: " + filePath);
+            e.printStackTrace();
+        }
     }
 }

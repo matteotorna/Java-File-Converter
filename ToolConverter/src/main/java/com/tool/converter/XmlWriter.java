@@ -16,29 +16,31 @@ public class XmlWriter {
     public String writeXml(List<ExcelRecord> records) {
         try {
             Document mainDoc = DocumentHelper.createDocument();
-            Element rootElement = mainDoc.addElement("root"); // Elemento radice generico
+            Element rootElement = mainDoc.addElement("data");
+            rootElement.addNamespace("xmlns", "http://www.example.com/xmlns");
+            rootElement.addNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            rootElement.addAttribute("xsi:schemaLocation", "http://www.example.com/xmlns schema.xsd");
 
             for (ExcelRecord record : records) {
-                Element recordElement = rootElement.addElement("record"); // Elemento radice per il record
+                Element recordElement = rootElement.addElement("record");
 
                 Map<String, Object> data = record.getData();
                 for (Map.Entry<String, Object> entry : data.entrySet()) {
                     String columnName = entry.getKey();
                     Object value = entry.getValue();
 
-                    // Crea elementi XML basati sulle colonne e i valori dell'ExcelRecord
                     Element columnElement = recordElement.addElement(getValidXmlName(columnName));
                     if (value != null) {
-                        columnElement.setText(value.toString()); // Usa setText per impostare il contenuto dell'elemento
+                        columnElement.setText(value.toString());
                     } else {
-                        // Tratta valori nulli come vuoti o gestiscili come preferisci
                         columnElement.setText("");
                     }
                 }
             }
 
-            // Formatta il documento XML in modo che sia ben leggibile
             OutputFormat format = OutputFormat.createPrettyPrint();
+            format.setNewlines(true);
+            format.setTrimText(false);
             StringWriter stringWriter = new StringWriter();
             XMLWriter writer = new XMLWriter(stringWriter, format);
             writer.write(mainDoc);
@@ -48,12 +50,11 @@ public class XmlWriter {
             return stringWriter.toString();
         } catch (Exception e) {
             e.printStackTrace();
-            return null; // Tratta l'errore in qualche modo
+            return null;
         }
     }
 
     private String getValidXmlName(String columnName) {
-        // Rimuovi i caratteri non validi sostituendoli con vuoti
         return columnName.replaceAll("[^a-zA-Z0-9]", "");
     }
 }
