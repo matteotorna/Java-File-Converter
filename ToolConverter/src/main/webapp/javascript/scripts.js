@@ -215,7 +215,7 @@ function startProgressBar() {
 
 			setTimeout(() => {
 				activateTab(document.querySelector('.tab-item[data-target="#tab2"]'));
-			}, 600);
+			}, 800);
 		} else {
 			width++;
 			progress.style.width = width + "%";
@@ -392,7 +392,7 @@ function downloadExampleFile() {
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
-			a.download = 'Vdt.xlsx';
+			a.download = 'Example.xlsx';
 			document.body.appendChild(a);
 			a.click();
 			document.body.removeChild(a);
