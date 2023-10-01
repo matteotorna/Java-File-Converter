@@ -241,7 +241,7 @@ h2 {
 }
 
 .progress-container {
-  margin: 10px 0;
+  margin: 20px 0;
   display: none;
   justify-content: center;
   align-items: center;
@@ -408,7 +408,7 @@ h2 {
 }
 
 #tab2 {
-  height: 72vh;
+  height: 65vh;
 }
  
 #fileList {
@@ -593,7 +593,7 @@ h2 {
 }
 
 #tab3{
-	height: 72vh;
+	height: 65vh;
 	/* overflow-y: scroll; */
 	position: relative;
 }
@@ -907,4 +907,8 @@ h2 {
 .delete-all-button:active {
   background-color: #d1d1d1;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Aumenta l'ombra durante il click */
+}
+
+.tab-content {
+  transition: opacity 0.5s ease;
 }

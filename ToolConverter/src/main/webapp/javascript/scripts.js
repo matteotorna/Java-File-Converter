@@ -1,7 +1,6 @@
 // Selectors
 const dropArea = document.querySelector(".drag-area");
 const dragText = document.querySelector(".header");
-const downloadButton = document.querySelector(".download");
 const input = document.querySelector("input[type='file']");
 const button = dropArea.querySelector(".button");
 const progress = document.querySelector(".progress");
@@ -16,93 +15,91 @@ const deleteAllButton = document.getElementById("deleteAllButton");
 
 let files = [];
 
-downloadButton.disabled = true;
-
 // Load saved activities from localStorage
 loadSavedActivities();
 
 //Functions
 
 function addFileToList(file) {
-  files.push(file);
-  renderFileList();
-  addToActivityList(`File uploaded: ${file.name}`);
+	files.push(file);
+	renderFileList();
+	addToActivityList(`File uploaded: ${file.name}`);
 }
 
 function renderFileList() {
-  const fileList = document.getElementById("fileList");
-  fileList.innerHTML = "";
+	const fileList = document.getElementById("fileList");
+	fileList.innerHTML = "";
 
-  files.forEach((file) => {
-    const listItem = document.createElement("li");
-    listItem.textContent = `${file.name} - ${(file.size / 1024).toFixed(2)} KB`;
+	files.forEach((file) => {
+		const listItem = document.createElement("li");
+		listItem.textContent = `${file.name} - ${(file.size / 1024).toFixed(2)} KB`;
 
-    const fileActionButtons = document.createElement("div");
-    fileActionButtons.classList.add("file-action-buttons");
+		const fileActionButtons = document.createElement("div");
+		fileActionButtons.classList.add("file-action-buttons");
 
-    const convertButtonXml = createConvertButton(file, "XML");
-    const convertButtonJson = createConvertButton(file, "JSON");
-    const downloadButton = createDownloadButton(file);
-    const removeButton = document.createElement("button");
-    removeButton.innerHTML = '<i class="fas fa-trash-alt fa-lg"></i>';
-    removeButton.classList.add("file-action-button", "remove-button");
-    removeButton.addEventListener("click", () => {
-      files = files.filter((f) => f !== file);
-      renderFileList();
-    });
+		const convertButtonXml = createConvertButton(file, "XML");
+		const convertButtonJson = createConvertButton(file, "JSON");
+		const downloadButton = createDownloadButton(file);
+		const removeButton = document.createElement("button");
+		removeButton.innerHTML = '<i class="fas fa-trash-alt fa-lg"></i>';
+		removeButton.classList.add("file-action-button", "remove-button");
+		removeButton.addEventListener("click", () => {
+			files = files.filter((f) => f !== file);
+			renderFileList();
+		});
 
-    // Aggiungi tooltip alle icone
-    convertButtonXml.title = "XML";
-    convertButtonJson.title = "JSON";
-    downloadButton.title = "Excel";
-    removeButton.title = "Delete";
+		// Aggiungi tooltip alle icone
+		convertButtonXml.title = "XML";
+		convertButtonJson.title = "JSON";
+		downloadButton.title = "Excel";
+		removeButton.title = "Delete";
 
-    fileActionButtons.appendChild(convertButtonXml);
-    fileActionButtons.appendChild(convertButtonJson);
-    fileActionButtons.appendChild(downloadButton);
-    fileActionButtons.appendChild(removeButton);
+		fileActionButtons.appendChild(convertButtonXml);
+		fileActionButtons.appendChild(convertButtonJson);
+		fileActionButtons.appendChild(downloadButton);
+		fileActionButtons.appendChild(removeButton);
 
-    listItem.appendChild(fileActionButtons);
-    fileList.appendChild(listItem);
-  });
+		listItem.appendChild(fileActionButtons);
+		fileList.appendChild(listItem);
+	});
 }
 
 
 
 function sortFilesBy(property) {
-  files.sort((a, b) => {
-    if (property === 'name') {
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
-      if (nameA < nameB) return -1;
-      if (nameA > nameB) return 1;
-      return 0;
-    } else if (property === 'size') {
-      return a.size - b.size;
-    }
-  });
+	files.sort((a, b) => {
+		if (property === 'name') {
+			const nameA = a.name.toLowerCase();
+			const nameB = b.name.toLowerCase();
+			if (nameA < nameB) return -1;
+			if (nameA > nameB) return 1;
+			return 0;
+		} else if (property === 'size') {
+			return a.size - b.size;
+		}
+	});
 
-  renderFileList();
+	renderFileList();
 }
 
 function createConvertButton(file, type) {
-  const convertButton = document.createElement("button");
-  convertButton.classList.add("convert-button");
-  convertButton.addEventListener("click", () => {
-    if (type === "XML") {
-      convertFileToXml(file);
-    } else if (type === "JSON") {
-      convertFileToJson(file);
-    }
-  });
+	const convertButton = document.createElement("button");
+	convertButton.classList.add("convert-button");
+	convertButton.addEventListener("click", () => {
+		if (type === "XML") {
+			convertFileToXml(file);
+		} else if (type === "JSON") {
+			convertFileToJson(file);
+		}
+	});
 
-  if (type === "XML") {
-    convertButton.innerHTML += '<i class="fas fa-file-code fa-lg"></i>';
-  } else if (type === "JSON") {
-    convertButton.innerHTML += '<i class="fas fa-file-code fa-lg json-icon"></i>';
-  }
+	if (type === "XML") {
+		convertButton.innerHTML += '<i class="fas fa-file-code fa-lg"></i>';
+	} else if (type === "JSON") {
+		convertButton.innerHTML += '<i class="fas fa-file-code fa-lg json-icon"></i>';
+	}
 
-  return convertButton;
+	return convertButton;
 }
 
 function convertFileToXml(file) {
@@ -150,62 +147,62 @@ function convertFileToXml(file) {
 }
 
 function convertFileToJson(file) {
-  const reader = new FileReader();
+	const reader = new FileReader();
 
-  reader.onload = (event) => {
-    const data = event.target.result;
-    const workbook = XLSX.read(data, { type: "binary" });
+	reader.onload = (event) => {
+		const data = event.target.result;
+		const workbook = XLSX.read(data, { type: "binary" });
 
-    // Supponendo che tu voglia convertire il primo foglio Excel in JSON
-    const firstSheetName = workbook.SheetNames[0];
-    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+		// Supponendo che tu voglia convertire il primo foglio Excel in JSON
+		const firstSheetName = workbook.SheetNames[0];
+		const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
 
-    // Ora hai il JSON risultante dal file Excel
-    console.log(jsonData);
+		// Ora hai il JSON risultante dal file Excel
+		console.log(jsonData);
 
-    // Chiama la funzione downloadJsonFile per scaricare il JSON
-    downloadJsonFile(jsonData, "output.json");
+		// Chiama la funzione downloadJsonFile per scaricare il JSON
+		downloadJsonFile(jsonData, "output.json");
 
-  };
+	};
 
-  reader.readAsBinaryString(file);
+	reader.readAsBinaryString(file);
 }
 
 function downloadJsonFile(jsonData, fileName) {
-  // Crea un oggetto Blob dal JSON
-  const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
+	// Crea un oggetto Blob dal JSON
+	const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
 
-  // Crea un URL per il Blob
-  const jsonBlobURL = URL.createObjectURL(jsonBlob);
+	// Crea un URL per il Blob
+	const jsonBlobURL = URL.createObjectURL(jsonBlob);
 
-  // Crea un elemento "a" per il download
-  const a = document.createElement("a");
-  a.href = jsonBlobURL;
-  a.download = fileName || "download.json";
+	// Crea un elemento "a" per il download
+	const a = document.createElement("a");
+	a.href = jsonBlobURL;
+	a.download = fileName || "download.json";
 
-  // Simula il clic sull'elemento "a" per avviare il download
-  a.click();
+	// Simula il clic sull'elemento "a" per avviare il download
+	a.click();
 
-  // Rilascia l'URL del Blob quando hai finito
-  URL.revokeObjectURL(jsonBlobURL);
+	// Rilascia l'URL del Blob quando hai finito
+	URL.revokeObjectURL(jsonBlobURL);
 }
 
 
 function createDownloadButton(file) {
-  const downloadButton = document.createElement("button");
-  downloadButton.innerHTML = '<i class="fas fa-file-excel fa-lg"></i>';
-  downloadButton.addEventListener("click", () => {
-    const fileURL = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = fileURL;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+	const downloadButton = document.createElement("button");
+	downloadButton.innerHTML = '<i class="fas fa-file-excel fa-lg"></i>';
+	downloadButton.addEventListener("click", () => {
+		const fileURL = URL.createObjectURL(file);
+		const a = document.createElement("a");
+		a.href = fileURL;
+		a.download = file.name;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
 
-    addToActivityList(`File downloaded: ${file.name}`);
-  });
-  return downloadButton;
+		addToActivityList(`File downloaded: ${file.name}`);
+	});
+	return downloadButton;
 }
 
 
@@ -215,14 +212,18 @@ function startProgressBar() {
 	const interval = setInterval(() => {
 		if (width >= 100) {
 			clearInterval(interval);
-			// Enable download button when progress reaches 100%
-			downloadButton.disabled = false;
+
+			setTimeout(() => {
+				activateTab(document.querySelector('.tab-item[data-target="#tab2"]'));
+			}, 600);
 		} else {
 			width++;
 			progress.style.width = width + "%";
 			progressPercent.textContent = width + "%";
 		}
 	}, 10);
+
+
 }
 
 function resetProgressBar() {
@@ -246,8 +247,6 @@ function resetTool() {
 	// Reset drop area
 	dropArea.classList.remove("active");
 	dragText.textContent = "Drag & Drop";
-	// Disable download button
-	downloadButton.disabled = true;
 	// Remove all files from the file list
 	const fileList = document.getElementById("fileList");
 	while (fileList.firstChild) {
@@ -346,7 +345,6 @@ function displayFile() {
 		} else {
 			fileReader.readAsDataURL(file);
 		}
-		downloadButton.addEventListener("click", downloadFile);
 
 		addToActivityList(`File displayed: ${file.name}`);
 
@@ -371,9 +369,9 @@ function downloadFile() {
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
-		
+
 		addToActivityList(`File downloaded: ${file.name}`);
-		
+
 	} else {
 		const errorMessage = document.getElementById("error-message");
 		if (errorMessage) {
@@ -468,6 +466,7 @@ document.getElementById("uploadForm").addEventListener("submit", function(event)
 			a.click();
 			document.body.removeChild(a);
 			resetProgressBar();
+
 		})
 		.catch(error => {
 			alert(error.message);
@@ -561,22 +560,22 @@ clearActivityButton.addEventListener("click", () => {
 
 
 sortSelect.addEventListener('change', (event) => {
-  const selectedProperty = event.target.value;
-  sortFilesBy(selectedProperty);
+	const selectedProperty = event.target.value;
+	sortFilesBy(selectedProperty);
 });
 
 sortSelect.addEventListener('click', () => {
-  sortDropdown.classList.toggle('open');
+	sortDropdown.classList.toggle('open');
 });
 
 document.addEventListener('click', (event) => {
-  const targetElement = event.target;
-  if (!sortDropdown.contains(targetElement)) {
-    sortDropdown.classList.remove('open');
-  }
+	const targetElement = event.target;
+	if (!sortDropdown.contains(targetElement)) {
+		sortDropdown.classList.remove('open');
+	}
 });
 
 deleteAllButton.addEventListener("click", () => {
-  files = [];
-  renderFileList();
+	files = [];
+	renderFileList();
 });
