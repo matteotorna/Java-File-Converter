@@ -64,8 +64,6 @@ function renderFileList() {
 	});
 }
 
-
-
 function sortFilesBy(property) {
 	files.sort((a, b) => {
 		if (property === 'name') {
@@ -147,62 +145,83 @@ function convertFileToXml(file) {
 }
 
 function convertFileToJson(file) {
-	const reader = new FileReader();
+    // Mostra il loader
+    const loader = document.getElementById("loader");
+    loader.style.display = "block";
 
-	reader.onload = (event) => {
-		const data = event.target.result;
-		const workbook = XLSX.read(data, { type: "binary" });
+    const reader = new FileReader();
 
-		// Supponendo che tu voglia convertire il primo foglio Excel in JSON
-		const firstSheetName = workbook.SheetNames[0];
-		const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+    reader.onload = (event) => {
+        const data = event.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
 
-		// Ora hai il JSON risultante dal file Excel
-		console.log(jsonData);
+        // Supponendo che tu voglia convertire il primo foglio Excel in JSON
+        const firstSheetName = workbook.SheetNames[0];
+        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
 
-		// Chiama la funzione downloadJsonFile per scaricare il JSON
-		downloadJsonFile(jsonData, "output.json");
+        // Ora hai il JSON risultante dal file Excel
+        console.log(jsonData);
 
-	};
+        // Chiama la funzione downloadJsonFile per scaricare il JSON
+        downloadJsonFile(jsonData, "output.json");
 
-	reader.readAsBinaryString(file);
+        // Nascondi il loader dopo aver completato la conversione
+        loader.style.display = "none";
+    };
+
+    reader.readAsBinaryString(file);
 }
 
+
 function downloadJsonFile(jsonData, fileName) {
-	// Crea un oggetto Blob dal JSON
-	const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
+    // Mostra il loader
+    const loader = document.getElementById("loader");
+    loader.style.display = "block";
 
-	// Crea un URL per il Blob
-	const jsonBlobURL = URL.createObjectURL(jsonBlob);
+    // Crea un oggetto Blob dal JSON
+    const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
 
-	// Crea un elemento "a" per il download
-	const a = document.createElement("a");
-	a.href = jsonBlobURL;
-	a.download = fileName || "download.json";
+    // Crea un URL per il Blob
+    const jsonBlobURL = URL.createObjectURL(jsonBlob);
 
-	// Simula il clic sull'elemento "a" per avviare il download
-	a.click();
+    // Crea un elemento "a" per il download
+    const a = document.createElement("a");
+    a.href = jsonBlobURL;
+    a.download = fileName || "download.json";
 
-	// Rilascia l'URL del Blob quando hai finito
-	URL.revokeObjectURL(jsonBlobURL);
+    // Simula il clic sull'elemento "a" per avviare il download
+    a.click();
+
+    // Rilascia l'URL del Blob quando hai finito
+    URL.revokeObjectURL(jsonBlobURL);
+
+    // Nascondi il loader dopo aver completato il download
+    loader.style.display = "none";
 }
 
 
 function createDownloadButton(file) {
-	const downloadButton = document.createElement("button");
-	downloadButton.innerHTML = '<i class="fas fa-file-excel fa-lg"></i>';
-	downloadButton.addEventListener("click", () => {
-		const fileURL = URL.createObjectURL(file);
-		const a = document.createElement("a");
-		a.href = fileURL;
-		a.download = file.name;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
+    const downloadButton = document.createElement("button");
+    downloadButton.innerHTML = '<i class="fas fa-file-excel fa-lg"></i>';
+    downloadButton.addEventListener("click", () => {
+        // Mostra il loader
+        const loader = document.getElementById("loader");
+        loader.style.display = "block";
 
-		addToActivityList(`File downloaded: ${file.name}`);
-	});
-	return downloadButton;
+        const fileURL = URL.createObjectURL(file);
+        const a = document.createElement("a");
+        a.href = fileURL;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        addToActivityList(`File downloaded: ${file.name}`);
+
+        // Nascondi il loader dopo aver completato il download
+        loader.style.display = "none";
+    });
+    return downloadButton;
 }
 
 
