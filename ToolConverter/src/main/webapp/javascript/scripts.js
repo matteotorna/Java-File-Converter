@@ -27,42 +27,47 @@ function addFileToList(file) {
 }
 
 function renderFileList() {
-	const fileList = document.getElementById("fileList");
-	fileList.innerHTML = "";
+  const fileList = document.getElementById("fileList");
+  fileList.innerHTML = "";
 
-	files.forEach((file) => {
-		const listItem = document.createElement("li");
-		listItem.textContent = `${file.name} - ${(file.size / 1024).toFixed(2)} KB`;
+  files.forEach((file) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${file.name} - ${(file.size / 1024).toFixed(2)} KB`;
 
-		const fileActionButtons = document.createElement("div");
-		fileActionButtons.classList.add("file-action-buttons");
+    const fileActionButtons = document.createElement("div");
+    fileActionButtons.classList.add("file-action-buttons");
 
-		const convertButtonXml = createConvertButton(file, "XML");
-		const convertButtonJson = createConvertButton(file, "JSON");
-		const downloadButton = createDownloadButton(file);
-		const removeButton = document.createElement("button");
-		removeButton.innerHTML = '<i class="fas fa-trash-alt fa-lg"></i>';
-		removeButton.classList.add("file-action-button", "remove-button");
-		removeButton.addEventListener("click", () => {
-			files = files.filter((f) => f !== file);
-			renderFileList();
-		});
+    const convertButtonXml = createConvertButton(file, "XML");
+    const convertButtonJson = createConvertButton(file, "JSON");
+    const convertButtonPdf = createConvertButton(file, "PDF"); // Aggiungi questa linea
 
-		// Aggiungi tooltip alle icone
-		convertButtonXml.title = "XML";
-		convertButtonJson.title = "JSON";
-		downloadButton.title = "Excel";
-		removeButton.title = "Delete";
+    const downloadButton = createDownloadButton(file);
+    const removeButton = document.createElement("button");
+    removeButton.innerHTML = '<i class="fas fa-trash-alt fa-lg"></i>';
+    removeButton.classList.add("file-action-button", "remove-button");
+    removeButton.addEventListener("click", () => {
+      files = files.filter((f) => f !== file);
+      renderFileList();
+    });
 
-		fileActionButtons.appendChild(convertButtonXml);
-		fileActionButtons.appendChild(convertButtonJson);
-		fileActionButtons.appendChild(downloadButton);
-		fileActionButtons.appendChild(removeButton);
+    // Aggiungi tooltip alle icone
+    convertButtonXml.title = "XML";
+    convertButtonJson.title = "JSON";
+    convertButtonPdf.title = "PDF"; // Aggiungi questa linea
+    downloadButton.title = "Excel";
+    removeButton.title = "Delete";
 
-		listItem.appendChild(fileActionButtons);
-		fileList.appendChild(listItem);
-	});
+    fileActionButtons.appendChild(convertButtonXml);
+    fileActionButtons.appendChild(convertButtonJson);
+    fileActionButtons.appendChild(convertButtonPdf); // Aggiungi questa linea
+    fileActionButtons.appendChild(downloadButton);
+    fileActionButtons.appendChild(removeButton);
+
+    listItem.appendChild(fileActionButtons);
+    fileList.appendChild(listItem);
+  });
 }
+
 
 function sortFilesBy(property) {
 	files.sort((a, b) => {
@@ -81,24 +86,106 @@ function sortFilesBy(property) {
 }
 
 function createConvertButton(file, type) {
-	const convertButton = document.createElement("button");
-	convertButton.classList.add("convert-button");
-	convertButton.addEventListener("click", () => {
-		if (type === "XML") {
-			convertFileToXml(file);
-		} else if (type === "JSON") {
-			convertFileToJson(file);
-		}
-	});
+  const convertButton = document.createElement("button");
+  convertButton.classList.add("convert-button");
+  convertButton.addEventListener("click", () => {
+    if (type === "XML") {
+      convertFileToXml(file);
+    } else if (type === "JSON") {
+      convertFileToJson(file);
+    } else if (type === "PDF") { // Aggiungi questa parte
+      convertFileToPdf(file);
+    }
+  });
 
-	if (type === "XML") {
-		convertButton.innerHTML += '<i class="fas fa-file-code fa-lg"></i>';
-	} else if (type === "JSON") {
-		convertButton.innerHTML += '<i class="fas fa-file-code fa-lg json-icon"></i>';
-	}
+  if (type === "XML") {
+    convertButton.innerHTML += '<i class="fas fa-file-code fa-lg"></i>';
+  } else if (type === "JSON") {
+    convertButton.innerHTML += '<i class="fas fa-file-code fa-lg json-icon"></i>';
+  } else if (type === "PDF") { // Aggiungi questa parte
+    convertButton.innerHTML += '<i class="far fa-file-pdf fa-lg"></i>';
+  }
 
-	return convertButton;
+  return convertButton;
 }
+
+function convertFileToPdf(file) {
+  // Mostra il loader
+  const loader = document.getElementById("loader");
+  loader.style.display = "block";
+
+  try {
+    const reader = new FileReader();
+    reader.onload = function () {
+      const data = new Uint8Array(reader.result);
+
+      // Usa SheetJS per leggere il file Excel
+      const workbook = XLSX.read(data, { type: "array" });
+
+      // Seleziona il primo foglio del file Excel
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Crea una tabella HTML dal foglio Excel
+      const htmlTable = XLSX.utils.sheet_to_html(worksheet);
+
+      // Creazione di una pagina HTML completa con la tabella
+      const htmlContent = `
+        <html>
+          <head>
+            <style>
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+              }
+            </style>
+          </head>
+          <body>
+            ${htmlTable}
+          </body>
+        </html>
+      `;
+
+      // Creazione di un iframe nascosto per la stampa
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      // Caricamento del contenuto HTML nell'iframe
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      iframeDoc.open();
+      iframeDoc.write(htmlContent);
+      iframeDoc.close();
+
+      // Stampa la pagina HTML in un file PDF
+      iframe.focus();
+      iframe.contentWindow.print();
+
+      // Rimuovi l'iframe dopo la stampa
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+
+        // Nasconde il loader
+        loader.style.display = "none";
+
+        // Aggiungi l'attività al registro delle attività
+        addToActivityList(`File converted to PDF: ${file.name}`);
+      }, 1000);
+    };
+
+    reader.readAsArrayBuffer(file);
+  } catch (error) {
+    alert(`Errore durante la conversione in PDF: ${error.message}`);
+    // Nasconde il loader in caso di errore
+    loader.style.display = "none";
+  }
+}
+
 
 function convertFileToXml(file) {
 
