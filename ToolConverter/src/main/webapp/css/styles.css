@@ -892,17 +892,17 @@ h2 {
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   float: right;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Aggiunge l'ombra */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
 }
 
 .delete-all-button:hover {
   background-color: #e8e8e8;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aumenta l'ombra durante l'hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .delete-all-button:active {
   background-color: #d1d1d1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Aumenta l'ombra durante il click */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); 
 }
 
 .tab-content {
