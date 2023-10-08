@@ -19,7 +19,6 @@ let files = [];
 loadSavedActivities();
 
 //Functions
-
 function addFileToList(file) {
 	files.push(file);
 	renderFileList();
@@ -39,9 +38,9 @@ function renderFileList() {
 
     const convertButtonXml = createConvertButton(file, "XML");
     const convertButtonJson = createConvertButton(file, "JSON");
-    const convertButtonPdf = createConvertButton(file, "PDF"); // Aggiungi questa linea
+    const convertButtonPdf = createConvertButton(file, "PDF");
+    const convertButtonCsv = createConvertButton(file, "CSV"); 
 
-    const downloadButton = createDownloadButton(file);
     const removeButton = document.createElement("button");
     removeButton.innerHTML = '<i class="fas fa-trash-alt fa-lg"></i>';
     removeButton.classList.add("file-action-button", "remove-button");
@@ -53,14 +52,14 @@ function renderFileList() {
     // Aggiungi tooltip alle icone
     convertButtonXml.title = "XML";
     convertButtonJson.title = "JSON";
-    convertButtonPdf.title = "PDF"; // Aggiungi questa linea
-    downloadButton.title = "Excel";
+    convertButtonPdf.title = "PDF";
+    convertButtonCsv.title = "CSV"; 
     removeButton.title = "Delete";
 
     fileActionButtons.appendChild(convertButtonXml);
     fileActionButtons.appendChild(convertButtonJson);
-    fileActionButtons.appendChild(convertButtonPdf); // Aggiungi questa linea
-    fileActionButtons.appendChild(downloadButton);
+    fileActionButtons.appendChild(convertButtonPdf);
+    fileActionButtons.appendChild(convertButtonCsv); 
     fileActionButtons.appendChild(removeButton);
 
     listItem.appendChild(fileActionButtons);
@@ -93,21 +92,26 @@ function createConvertButton(file, type) {
       convertFileToXml(file);
     } else if (type === "JSON") {
       convertFileToJson(file);
-    } else if (type === "PDF") { // Aggiungi questa parte
+    } else if (type === "PDF") {
       convertFileToPdf(file);
+    } else if (type === "CSV") {
+      convertFileToCsv(file);
     }
   });
 
   if (type === "XML") {
-    convertButton.innerHTML += '<i class="fas fa-file-code fa-lg"></i>';
+    convertButton.innerHTML += '<i class="fas fa-file-code fa-lg xml-icon"></i>';
   } else if (type === "JSON") {
     convertButton.innerHTML += '<i class="fas fa-file-code fa-lg json-icon"></i>';
-  } else if (type === "PDF") { // Aggiungi questa parte
+  } else if (type === "PDF") {
     convertButton.innerHTML += '<i class="far fa-file-pdf fa-lg"></i>';
+  } else if (type === "CSV") {
+    convertButton.innerHTML += '<i class="fas fa-file-csv fa-lg csv-icon-green"></i>'; 
   }
 
   return convertButton;
 }
+
 
 function convertFileToPdf(file) {
   // Mostra il loader
@@ -287,29 +291,44 @@ function downloadJsonFile(jsonData, fileName) {
 }
 
 
-function createDownloadButton(file) {
-    const downloadButton = document.createElement("button");
-    downloadButton.innerHTML = '<i class="fas fa-file-excel fa-lg"></i>';
-    downloadButton.addEventListener("click", () => {
-        // Mostra il loader
-        const loader = document.getElementById("loader");
-        loader.style.display = "block";
+function convertFileToCsv(file) {
+  // Mostra il loader
+  const loader = document.getElementById("loader");
+  loader.style.display = "block";
 
-        const fileURL = URL.createObjectURL(file);
-        const a = document.createElement("a");
-        a.href = fileURL;
-        a.download = file.name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+  const reader = new FileReader();
 
-        addToActivityList(`File downloaded: ${file.name}`);
+  reader.onload = (event) => {
+    const data = event.target.result;
+    const workbook = XLSX.read(data, { type: "binary" });
 
-        // Nascondi il loader dopo aver completato il download
-        loader.style.display = "none";
-    });
-    return downloadButton;
+    // Supponendo che tu voglia convertire il primo foglio Excel in CSV
+    const firstSheetName = workbook.SheetNames[0];
+    const csvData = XLSX.utils.sheet_to_csv(workbook.Sheets[firstSheetName]);
+
+    // Crea un oggetto Blob dal CSV
+    const csvBlob = new Blob([csvData], { type: "text/csv" });
+
+    // Crea un URL per il Blob
+    const csvBlobURL = URL.createObjectURL(csvBlob);
+
+    // Crea un elemento "a" per il download
+    const a = document.createElement("a");
+    a.href = csvBlobURL;
+    a.download = file.name.replace(/\.[^.]+$/, ".csv"); // Cambia l'estensione del nome del file a .csv
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Nascondi il loader dopo aver completato la conversione
+    loader.style.display = "none";
+
+    addToActivityList(`File converted to CSV: ${file.name}`);
+  };
+
+  reader.readAsBinaryString(file);
 }
+
 
 
 function startProgressBar() {

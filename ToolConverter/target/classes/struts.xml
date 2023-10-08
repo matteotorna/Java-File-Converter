@@ -6,19 +6,6 @@
 	<constant name="struts.multipart.maxSize" value="5242880" />
 	<package name="default" extends="struts-default" namespace="/">
 
-		<!-- FileDownloadAction -->
-		<action name="fileDownload"
-			class="com.tool.struts.FileDownloadAction">
-			<result name="success" type="stream">
-				<param name="contentType">application/xml</param>
-				<param name="inputName">inputStream</param>
-				<param name="contentDisposition">attachment;
-					filename="${filename}"</param>
-				<param name="bufferSize">1024</param>
-			</result>
-			<result name="error">/error.html</result>
-		</action>
-
 		<!-- FileUploadAction -->
 		<action name="uploadFile"
 			class="com.tool.struts.FileUploadAction">
