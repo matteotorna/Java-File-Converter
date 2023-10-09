@@ -4,7 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.opensymphony.xwork2.ActionSupport;
 import com.tool.converter.XmlWriter;
@@ -30,9 +34,16 @@ public class FileUploadAction extends ActionSupport {
             ExcelReader reader = new ExcelReader();
             List<ExcelRecord> records = reader.readDataFromExcel(new FileInputStream(file));
 
+            // Trasforma gli oggetti ExcelRecord in liste di mappe
+            List<Map<String, Object>> recordMaps = new ArrayList<>();
+            for (ExcelRecord record : records) {
+                Map<String, Object> recordMap = getObjectFieldsAsMap(record);
+                recordMaps.add(recordMap);
+            }
+
             // Elabora i record qui, ad esempio convertendoli in una stringa XML
             XmlWriter writer = new XmlWriter();
-            xmlContent = writer.writeXml(records); // Ottieni la stringa XML
+            xmlContent = writer.writeXml(recordMaps); // Ottieni la stringa XML
 
             if (xmlContent != null) {
                 // Imposta l'input stream per il risultato "success"
@@ -45,6 +56,22 @@ public class FileUploadAction extends ActionSupport {
         } else {
             return ERROR;
         }
+    }
+
+    private Map<String, Object> getObjectFieldsAsMap(Object obj) {
+        Map<String, Object> fieldMap = new HashMap<>();
+        Field[] fields = obj.getClass().getDeclaredFields();
+
+        try {
+            for (Field field : fields) {
+                field.setAccessible(true);
+                fieldMap.put(field.getName(), field.get(obj));
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return fieldMap;
     }
 
     public File getFile() {

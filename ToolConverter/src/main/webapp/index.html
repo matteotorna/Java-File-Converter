@@ -40,8 +40,9 @@
 					</div>
 					<span class="header">Drag & Drop</span> <span class="header">or
 						<span class="button">browse</span>
-					</span> <input type="file" name="file" hidden /> <span class="support">THIS
-						TOOL SUPPORTS ONLY XLSX'S FILE</span>
+					</span> <input type="file" name="file" hidden accept=".xlsx, .json, .csv, .xml" /> <span
+						class="support">THIS
+						TOOL SUPPORTS XLSX, JSON, CSV AND XML'S FILES</span>
 				</div>
 			</form>
 			<!-- Barra di avanzamento -->
@@ -106,13 +107,14 @@
 					<ul id="activityItems"></ul>
 				</div>
 				<button id="clearActivityButton">Cancella</button>
-				
-			<h2 style="margin-top: 70px;">Pdf, csv and others format's coming soon</h2>
+
+				<h2 style="margin-top: 70px;">Pdf, csv and others format's coming soon</h2>
 			</div>
 		</div>
 	</div>
 
 	<div id="error-message"></div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 	<script src="javascript/scripts.js"></script>
 
 </body>

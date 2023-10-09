@@ -20,6 +20,7 @@ loadSavedActivities();
 
 //Functions
 function addFileToList(file) {
+	file.extension = file.name.split('.').pop().toLowerCase();
 	files.push(file);
 	renderFileList();
 	addToActivityList(`File uploaded: ${file.name}`);
@@ -39,7 +40,7 @@ function renderFileList() {
     const convertButtonXml = createConvertButton(file, "XML");
     const convertButtonJson = createConvertButton(file, "JSON");
     const convertButtonPdf = createConvertButton(file, "PDF");
-    const convertButtonCsv = createConvertButton(file, "CSV"); 
+    const convertButtonCsv = createConvertButton(file, "CSV");
 
     const removeButton = document.createElement("button");
     removeButton.innerHTML = '<i class="fas fa-trash-alt fa-lg"></i>';
@@ -53,17 +54,26 @@ function renderFileList() {
     convertButtonXml.title = "XML";
     convertButtonJson.title = "JSON";
     convertButtonPdf.title = "PDF";
-    convertButtonCsv.title = "CSV"; 
+    convertButtonCsv.title = "CSV";
     removeButton.title = "Delete";
 
     fileActionButtons.appendChild(convertButtonXml);
     fileActionButtons.appendChild(convertButtonJson);
     fileActionButtons.appendChild(convertButtonPdf);
-    fileActionButtons.appendChild(convertButtonCsv); 
+    fileActionButtons.appendChild(convertButtonCsv);
     fileActionButtons.appendChild(removeButton);
 
     listItem.appendChild(fileActionButtons);
     fileList.appendChild(listItem);
+
+    // Nascondi le icone in base all'estensione del file
+    if (file.extension === "xml") {
+      convertButtonXml.style.display = "none";
+    } else if (file.extension === "json") {
+      convertButtonJson.style.display = "none";
+    } else if (file.extension === "csv") {
+      convertButtonCsv.style.display = "none";
+    }
   });
 }
 
@@ -111,7 +121,6 @@ function createConvertButton(file, type) {
 
   return convertButton;
 }
-
 
 function convertFileToPdf(file) {
   // Mostra il loader
@@ -189,6 +198,7 @@ function convertFileToPdf(file) {
     loader.style.display = "none";
   }
 }
+
 
 
 function convertFileToXml(file) {
@@ -347,8 +357,6 @@ function startProgressBar() {
 			progressPercent.textContent = width + "%";
 		}
 	}, 10);
-
-
 }
 
 function resetProgressBar() {
@@ -414,67 +422,100 @@ for (let i = 0; i < tabs.length; i++) {
 }
 
 function displayFile() {
-	if (file) {
-		dropArea.classList.add("active");
+  if (file) {
+    dropArea.classList.add("active");
 
-		let fileType = file.type;
-		let validExtensions = [
-			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-		];
+    let fileType = file.type;
+    let validExtensions = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/json",
+      "text/csv",
+      "application/xml",
+      "text/xml"
+    ];
 
-		if (!validExtensions.includes(fileType)) {
-			alert("Formato file non valido. Caricare solo file Excel.");
-			dropArea.classList.remove("active");
-			resetProgressBar();
-			return;
-		}
+    if (!validExtensions.includes(fileType)) {
+      alert("Formato file non valido. Caricare solo file Excel, JSON, CSV o XML.");
+      dropArea.classList.remove("active");
+      resetProgressBar();
+      return;
+    }
 
-		addFileToList(file);
+    addFileToList(file);
 
-		startProgressBar();
-		showProgressBar();
+    startProgressBar();
+    showProgressBar();
 
-		let fileReader = new FileReader();
+    let fileReader = new FileReader();
 
-		fileReader.onload = () => {
-			let fileURL = fileReader.result;
+    fileReader.onload = () => {
+      let fileContent = fileReader.result;
 
-			if (
-				fileType === "application/xml" ||
-				fileType === "text/xml"
-			) {
-				// Gestisce i file XML
-				let parser = new DOMParser();
-				let xmlDoc = parser.parseFromString(
-					fileURL,
-					"application/xml"
-				);
-				// Elabora xmlDoc secondo le necessità
-				console.log(xmlDoc);
-			} else if (
-				fileType ===
-				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-			) {
-				// Gestisce i file XML
-				let workbook = XLSX.read(fileURL, { type: "binary" });
-				// Processa i workbook secondo le necessità
-				console.log(workbook);
-			}
-		};
+      // Visualizza il contenuto del file nella console
+      console.log("Contenuto del file:");
+      console.log(fileContent);
 
-		if (
-			fileType ===
-			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-		) {
-			fileReader.readAsArrayBuffer(file);
-		} else {
-			fileReader.readAsDataURL(file);
-		}
+      if (fileType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        // Gestisci i file Excel come prima
+        console.log("Stai gestendo un file Excel:");
+        console.log(fileContent); // Verifica il contenuto del file Excel
+        let workbook = XLSX.read(fileContent, { type: "binary" });
+        // Processa workbook secondo le necessità
+        console.log(workbook);
+      } else if (fileType === "application/json") {
+        // Gestisci i file JSON come prima
+        console.log("Stai gestendo un file JSON:");
+        console.log(fileContent); // Verifica il contenuto del file JSON
+        let jsonData = JSON.parse(fileContent);
+        // Processa jsonData secondo le necessità
+        console.log(jsonData);
+      } else if (fileType === "text/csv") {
+        // Gestisci i file CSV come prima
+        console.log("Stai gestendo un file CSV:");
+        console.log(fileContent); // Verifica il contenuto del file CSV
+        Papa.parse(file, {
+          header: true,
+          dynamicTyping: true,
+          complete: function (results) {
+            // I dati del CSV sono disponibili in results.data
+            console.log(results.data);
+          },
+        });
+      } else if (fileType === "application/xml" || fileType === "text/xml") {
+        // Gestisci i file XML
+        console.log("Stai gestendo un file XML:");
 
-		addToActivityList(`File displayed: ${file.name}`);
+        // Analizza il contenuto XML con il DOMParser
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(fileContent, "text/xml");
 
-	}
+        // Puoi ora elaborare xmlDoc secondo le necessità
+        console.log(xmlDoc);
+
+        // Ad esempio, puoi accedere agli elementi XML
+        const rootElement = xmlDoc.documentElement;
+        console.log("Root element:", rootElement);
+
+        // Estrarre dati dall'XML
+        const elements = rootElement.getElementsByTagName("nome_elemento");
+        for (let i = 0; i < elements.length; i++) {
+          console.log("Elemento " + i + ":", elements[i].textContent);
+        }
+
+        // Ora puoi implementare la tua logica specifica per i file XML
+      }
+    };
+
+    if (fileType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+      fileReader.readAsArrayBuffer(file);
+    } else {
+      fileReader.readAsText(file);
+    }
+
+    addToActivityList(`File displayed: ${file.name}`);
+  }
 }
+
 
 function downloadFile() {
 	if (!file) {

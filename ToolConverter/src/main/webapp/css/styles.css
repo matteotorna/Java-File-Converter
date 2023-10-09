@@ -916,3 +916,7 @@ h2 {
 .xml-icon{
 	color: rgb(0, 0, 255);
 }
+
+.hidden-icon {
+  display: none;
+}

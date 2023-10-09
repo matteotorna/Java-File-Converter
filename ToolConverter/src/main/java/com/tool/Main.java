@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,10 +41,11 @@ public class Main {
 
             records = reader.readDataFromExcel(inputStream);
 
-            // Ora invece di scrivere su file, converti in stringhe XML e JSON
             logger.info("Generating XML data..");
             XmlWriter xmlWriter = new XmlWriter();
-            xmlData = xmlWriter.writeXml(records); // Assegnamento del valore restituito
+            List<Map<String, Object>> recordMaps = convertRecordsToMaps(records); // Converti la lista di ExcelRecord in una lista di mappe
+            xmlData = xmlWriter.writeXml(recordMaps); // Utilizza la lista di mappe per generare XML
+
 
             // Scrivi la stringa XML su un file (ad esempio, "output.xml")
             writeXmlToFile(xmlData, "output.xml");
@@ -60,4 +63,13 @@ public class Main {
             e.printStackTrace();
         }
     }
+    
+    private static List<Map<String, Object>> convertRecordsToMaps(List<ExcelRecord> records) {
+        List<Map<String, Object>> recordMaps = new ArrayList<>();
+        for (ExcelRecord record : records) {
+            recordMaps.add(record.getData());
+        }
+        return recordMaps;
+    }
+
 }
