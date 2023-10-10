@@ -77,7 +77,6 @@ function renderFileList() {
   });
 }
 
-
 function sortFilesBy(property) {
 	files.sort((a, b) => {
 		if (property === 'name') {
@@ -199,8 +198,6 @@ function convertFileToPdf(file) {
   }
 }
 
-
-
 function convertFileToXml(file) {
 
 	let formData = new FormData();
@@ -273,7 +270,6 @@ function convertFileToJson(file) {
     reader.readAsBinaryString(file);
 }
 
-
 function downloadJsonFile(jsonData, fileName) {
     // Mostra il loader
     const loader = document.getElementById("loader");
@@ -299,7 +295,6 @@ function downloadJsonFile(jsonData, fileName) {
     // Nascondi il loader dopo aver completato il download
     loader.style.display = "none";
 }
-
 
 function convertFileToCsv(file) {
   // Mostra il loader
@@ -338,8 +333,6 @@ function convertFileToCsv(file) {
 
   reader.readAsBinaryString(file);
 }
-
-
 
 function startProgressBar() {
 	let width = 0;
@@ -515,7 +508,6 @@ function displayFile() {
     addToActivityList(`File displayed: ${file.name}`);
   }
 }
-
 
 function downloadFile() {
 	if (!file) {
