@@ -98,13 +98,13 @@ function createConvertButton(file, type) {
   convertButton.classList.add("convert-button");
   convertButton.addEventListener("click", () => {
     if (type === "XML") {
-      convertFileToXml(file);
+      convertExcelToXml(file);
     } else if (type === "JSON") {
-      convertFileToJson(file);
+      convertExcelToJson(file);
     } else if (type === "PDF") {
-      convertFileToPdf(file);
+      convertExcelToPdf(file);
     } else if (type === "CSV") {
-      convertFileToCsv(file);
+      convertExcelToCsv(file);
     }
   });
 
@@ -121,8 +121,8 @@ function createConvertButton(file, type) {
   return convertButton;
 }
 
-function convertFileToPdf(file) {
-  // Mostra il loader
+function convertExcelToPdf(file) {
+
   const loader = document.getElementById("loader");
   loader.style.display = "block";
 
@@ -182,7 +182,6 @@ function convertFileToPdf(file) {
       setTimeout(() => {
         document.body.removeChild(iframe);
 
-        // Nasconde il loader
         loader.style.display = "none";
 
         // Aggiungi l'attività al registro delle attività
@@ -193,17 +192,16 @@ function convertFileToPdf(file) {
     reader.readAsArrayBuffer(file);
   } catch (error) {
     alert(`Errore durante la conversione in PDF: ${error.message}`);
-    // Nasconde il loader in caso di errore
+
     loader.style.display = "none";
   }
 }
 
-function convertFileToXml(file) {
+function convertExcelToXml(file) {
 
 	let formData = new FormData();
 	formData.append("file", file);
 
-	// Mostra il loader
 	const loader = document.getElementById("loader");
 	loader.style.display = "block";
 
@@ -215,13 +213,12 @@ function convertFileToXml(file) {
 			if (!response.ok) {
 				throw new Error("Errore durante la conversione del file in XML.");
 			}
-			return response.blob();  // restituisce un oggetto Blob
+			return response.blob(); 
 		})
 		.then(blob => {
 			// Crea un URL per il Blob
 			let fileURL = URL.createObjectURL(blob);
 
-			// Scarica il file XML
 			let a = document.createElement("a");
 			a.href = fileURL;
 			a.download = "output.xml";
@@ -229,7 +226,6 @@ function convertFileToXml(file) {
 			a.click();
 			document.body.removeChild(a);
 
-			// Nasconde il loader
 			loader.style.display = "none";
 		})
 		.catch(error => {
@@ -242,8 +238,8 @@ function convertFileToXml(file) {
 	addToActivityList(`File converted to XML: ${file.name}`);
 }
 
-function convertFileToJson(file) {
-    // Mostra il loader
+function convertExcelToJson(file) {
+ 
     const loader = document.getElementById("loader");
     loader.style.display = "block";
 
@@ -253,17 +249,14 @@ function convertFileToJson(file) {
         const data = event.target.result;
         const workbook = XLSX.read(data, { type: "binary" });
 
-        // Supponendo che tu voglia convertire il primo foglio Excel in JSON
         const firstSheetName = workbook.SheetNames[0];
         const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
 
-        // Ora hai il JSON risultante dal file Excel
         console.log(jsonData);
 
         // Chiama la funzione downloadJsonFile per scaricare il JSON
         downloadJsonFile(jsonData, "output.json");
 
-        // Nascondi il loader dopo aver completato la conversione
         loader.style.display = "none";
     };
 
@@ -271,7 +264,6 @@ function convertFileToJson(file) {
 }
 
 function downloadJsonFile(jsonData, fileName) {
-    // Mostra il loader
     const loader = document.getElementById("loader");
     loader.style.display = "block";
 
@@ -286,18 +278,15 @@ function downloadJsonFile(jsonData, fileName) {
     a.href = jsonBlobURL;
     a.download = fileName || "download.json";
 
-    // Simula il clic sull'elemento "a" per avviare il download
     a.click();
-
     // Rilascia l'URL del Blob quando hai finito
     URL.revokeObjectURL(jsonBlobURL);
 
-    // Nascondi il loader dopo aver completato il download
     loader.style.display = "none";
 }
 
-function convertFileToCsv(file) {
-  // Mostra il loader
+function convertExcelToCsv(file) {
+ 
   const loader = document.getElementById("loader");
   loader.style.display = "block";
 
@@ -307,7 +296,7 @@ function convertFileToCsv(file) {
     const data = event.target.result;
     const workbook = XLSX.read(data, { type: "binary" });
 
-    // Supponendo che tu voglia convertire il primo foglio Excel in CSV
+   
     const firstSheetName = workbook.SheetNames[0];
     const csvData = XLSX.utils.sheet_to_csv(workbook.Sheets[firstSheetName]);
 
@@ -317,7 +306,7 @@ function convertFileToCsv(file) {
     // Crea un URL per il Blob
     const csvBlobURL = URL.createObjectURL(csvBlob);
 
-    // Crea un elemento "a" per il download
+    
     const a = document.createElement("a");
     a.href = csvBlobURL;
     a.download = file.name.replace(/\.[^.]+$/, ".csv"); // Cambia l'estensione del nome del file a .csv
@@ -325,7 +314,6 @@ function convertFileToCsv(file) {
     a.click();
     document.body.removeChild(a);
 
-    // Nascondi il loader dopo aver completato la conversione
     loader.style.display = "none";
 
     addToActivityList(`File converted to CSV: ${file.name}`);
@@ -386,7 +374,7 @@ function resetTool() {
 }
 resetButton.addEventListener("click", resetTool);
 
-// Funzione per attivare le schede al click
+
 function activateTab(tab) {
 	const target = tab.dataset.target;
 	const tabContent = document.querySelector(target);
@@ -405,8 +393,6 @@ function activateTab(tab) {
 	tabContent.classList.add('active');
 }
 
-
-// Aggiungi l'event listener per le schede
 const tabs = document.querySelectorAll('.tab-item');
 for (let i = 0; i < tabs.length; i++) {
 	tabs[i].addEventListener('click', function() {
@@ -485,7 +471,6 @@ function displayFile() {
         // Puoi ora elaborare xmlDoc secondo le necessità
         console.log(xmlDoc);
 
-        // Ad esempio, puoi accedere agli elementi XML
         const rootElement = xmlDoc.documentElement;
         console.log("Root element:", rootElement);
 
@@ -602,7 +587,6 @@ document.getElementById("uploadForm").addEventListener("submit", function(event)
 	let formData = new FormData();
 	formData.append("file", file);
 
-	// Usa 'fetch' invece di 'XMLHttpRequest'
 	fetch("uploadFile.action", {
 		method: "POST",
 		body: formData
@@ -614,7 +598,6 @@ document.getElementById("uploadForm").addEventListener("submit", function(event)
 			return response.blob();  // restituisce un oggetto Blob
 		})
 		.then(blob => {
-			// Crea un URL per il Blob
 			let fileURL = URL.createObjectURL(blob);
 			// Scarica il file
 			let a = document.createElement("a");
