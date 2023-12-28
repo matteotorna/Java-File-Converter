@@ -13,7 +13,7 @@ body {
   justify-content: center;
   flex-direction: column;
   min-height: 100vh;
-  background: #e0eafc; /* fallback for old browsers */
+  background: #e0eafc; 
   background: -webkit-linear-gradient(to right, #cfdef3, #e0eafc);
   background: linear-gradient(to right, #cfdef3, #e0eafc);
 }
@@ -36,14 +36,13 @@ h2 {
 }
 
 .drag-area .support {
-	font-size: 12px;
+	font-size: 14px;
 	color: gray;
 	margin: 10px 0 15px 0;
 }
 
-/* drag area  CSS */
 .drag-area {
-  height: 360px;
+  height: 382px;
   border: 3px dashed #e0eafc;
   display: flex;
   align-items: center;
@@ -407,8 +406,18 @@ h2 {
   opacity: 0.3;
 }
 
+/* #tab1{
+  height: 64vh;
+} */
+
 #tab2 {
-  height: 65vh;
+  height: 64vh;
+}
+
+#tab3{
+	height: 64vh;
+	/* overflow-y: scroll; */
+	position: relative;
 }
  
 #fileList {
@@ -588,12 +597,6 @@ h2 {
   }
 }
 
-#tab3{
-	height: 65vh;
-	/* overflow-y: scroll; */
-	position: relative;
-}
-
 .blue-color{
 	color: blue;
 }
@@ -677,7 +680,7 @@ h2 {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-left: 90px;
+  margin-left: 110px;
 }
 
 #saveButton:hover {
@@ -910,14 +913,67 @@ h2 {
   transition: opacity 0.5s ease;
 }
 
-.csv-icon-green {
-  color: green;
+.csv-icon {
+  color: rgb(156, 20, 20);
 }
 
 .xml-icon{
 	color: rgb(0, 0, 255);
 }
 
+.excel-icon {
+  color: green;
+}
+
+.trash-icon {
+  color: #848789;
+}
+
 .hidden-icon {
   display: none;
+}
+
+.delete-all-button {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-all-button .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.delete-all-button .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.delete-all-button:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.delete-all-button.clicked .tooltiptext {
+  visibility: hidden;
+  opacity: 0;
 }
